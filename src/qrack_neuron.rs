@@ -44,7 +44,8 @@ pub struct QrackNeuron<'a> {
     target: u64,
     activation_fn: NeuronActivationFn,
     alpha: f64,
-    amp_count: u64
+    amp_count: u64,
+    angles: Vec<Float>
 }
 
 impl Clone for QrackNeuron<'_> {
@@ -60,7 +61,8 @@ impl Clone for QrackNeuron<'_> {
             target: self.target,
             activation_fn: self.activation_fn.clone(),
             alpha: self.alpha,
-            amp_count: self.amp_count
+            amp_count: self.amp_count,
+            angles: self.angles.clone()
         }
     }
 }
@@ -109,6 +111,7 @@ impl QrackNeuron<'_> {
             }
         }
         let amp_cnt = 1 << (ctrls.len() + 1);
+        let angles: Vec<Float> = vec![0 as Float; amp_cnt as usize];
         Ok(QrackNeuron{
             nid,
             simulator: sim,
@@ -116,7 +119,8 @@ impl QrackNeuron<'_> {
             target: trgt,
             activation_fn: act_fn,
             alpha: a,
-            amp_count: amp_cnt
+            amp_count: amp_cnt,
+            angles: angles
         })
     }
 
@@ -191,7 +195,7 @@ impl QrackNeuron<'_> {
         Ok(())
     }
 
-    pub fn predict(&self, e: bool, r: bool) -> Result<f64, QrackError> {
+    pub fn predict(&mut self, e: bool, r: bool) -> Result<f64, QrackError> {
         // Predict based on training
         //
         // "Predict" the anticipated output, based on input and training.
@@ -210,7 +214,7 @@ impl QrackNeuron<'_> {
 
         let result:f64;
         unsafe {
-            result = qrack_system::qneuron_predict(self.nid, e, r, self.activation_fn.clone() as u64, self.alpha);
+            result = qrack_system::qneuron_predict(self.nid, self.angles.as_mut_ptr(), e, r, self.activation_fn.clone() as u64, self.alpha);
         }
         if self.get_error() != 0 {
             return Err(QrackError{});
@@ -218,7 +222,7 @@ impl QrackNeuron<'_> {
         Ok(result)
     }
 
-    pub fn unpredict(&self, e: bool) -> Result<f64, QrackError> {
+    pub fn unpredict(&mut self, e: bool) -> Result<f64, QrackError> {
         // Uncompute a prediction
         //
         // Uncompute a 'prediction' of the anticipated output, based on
@@ -232,7 +236,7 @@ impl QrackNeuron<'_> {
 
         let result:f64;
         unsafe {
-            result = qrack_system::qneuron_unpredict(self.nid, e, self.activation_fn.clone() as u64, self.alpha);
+            result = qrack_system::qneuron_unpredict(self.nid, self.angles.as_mut_ptr(), e, self.activation_fn.clone() as u64, self.alpha);
         }
         if self.get_error() != 0 {
             return Err(QrackError{});
@@ -240,7 +244,7 @@ impl QrackNeuron<'_> {
         Ok(result)
     }
 
-    pub fn learn_cycle(&self, e: bool) -> Result<(), QrackError> {
+    pub fn learn_cycle(&mut self, e: bool) -> Result<(), QrackError> {
         // Run a learning cycle
         //
         // A learning cycle consists of predicting a result, saving the
@@ -253,12 +257,12 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         unsafe {
-            qrack_system::qneuron_learn_cycle(self.nid, e, self.activation_fn.clone() as u64, self.alpha);
+            qrack_system::qneuron_learn_cycle(self.nid, self.angles.as_mut_ptr(), e, self.activation_fn.clone() as u64, self.alpha);
         }
         self.check_error()
     }
 
-    pub fn learn(&self, eta: f64, e: bool, r: bool) -> Result<(), QrackError> {
+    pub fn learn(&mut self, eta: f64, e: bool, r: bool) -> Result<(), QrackError> {
         // Learn from current qubit state
         //
         // "Learn" to associate current inputs with output. Based on
@@ -275,12 +279,12 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         unsafe {
-            qrack_system::qneuron_learn(self.nid, eta, e, r, self.activation_fn.clone() as u64, self.alpha);
+            qrack_system::qneuron_learn(self.nid, self.angles.as_mut_ptr(), eta, e, r, self.activation_fn.clone() as u64, self.alpha);
         }
         self.check_error()
     }
 
-    pub fn learn_permutation(&self, eta: f64, e: bool, r: bool) -> Result<(), QrackError> {
+    pub fn learn_permutation(&mut self, eta: f64, e: bool, r: bool) -> Result<(), QrackError> {
         // Learn from current classical state
         //
         // Learn to associate current inputs with output, under the
@@ -297,7 +301,7 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         unsafe {
-            qrack_system::qneuron_learn_permutation(self.nid, eta, e, r, self.activation_fn.clone() as u64, self.alpha);
+            qrack_system::qneuron_learn_permutation(self.nid, self.angles.as_mut_ptr(), eta, e, r, self.activation_fn.clone() as u64, self.alpha);
         }
         self.check_error()
     }

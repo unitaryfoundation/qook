@@ -71,6 +71,7 @@ pub type ProbAmpCallback =
 pub struct _QrackTimeEvolveOpHeader {
     _unused: [u8; 0],
 }
+pub type real1_s = f32;
 extern "C" {
     pub fn get_error(sid: uintq) -> ::std::os::raw::c_int;
 }
@@ -133,7 +134,7 @@ extern "C" {
     pub fn HighestProbAllN(sid: uintq, n: uintq, r: *mut uintq);
 }
 extern "C" {
-    pub fn ProbAll(sid: uintq, n: uintq, q: *mut uintq, p: *mut f32);
+    pub fn ProbAll(sid: uintq, n: uintq, q: *mut uintq, p: *mut real1_s);
 }
 extern "C" {
     pub fn Prob(sid: uintq, q: uintq) -> f64;
@@ -192,30 +193,30 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    pub fn FactorizedExpectationFp(sid: uintq, n: uintq, q: *mut uintq, c: *mut f32) -> f64;
+    pub fn FactorizedExpectationFp(sid: uintq, n: uintq, q: *mut uintq, c: *mut real1_s) -> f64;
 }
 extern "C" {
     pub fn FactorizedExpectationFpRdm(
         sid: uintq,
         n: uintq,
         q: *mut uintq,
-        c: *mut f32,
+        c: *mut real1_s,
         r: bool,
     ) -> f64;
 }
 extern "C" {
-    pub fn UnitaryExpectation(sid: uintq, n: uintq, q: *mut uintq, b: *mut f32) -> f64;
+    pub fn UnitaryExpectation(sid: uintq, n: uintq, q: *mut uintq, b: *mut real1_s) -> f64;
 }
 extern "C" {
-    pub fn MatrixExpectation(sid: uintq, n: uintq, q: *mut uintq, b: *mut f32) -> f64;
+    pub fn MatrixExpectation(sid: uintq, n: uintq, q: *mut uintq, b: *mut real1_s) -> f64;
 }
 extern "C" {
     pub fn UnitaryExpectationEigenVal(
         sid: uintq,
         n: uintq,
         q: *mut uintq,
-        b: *mut f32,
-        e: *mut f32,
+        b: *mut real1_s,
+        e: *mut real1_s,
     ) -> f64;
 }
 extern "C" {
@@ -223,35 +224,35 @@ extern "C" {
         sid: uintq,
         n: uintq,
         q: *mut uintq,
-        b: *mut f32,
-        e: *mut f32,
+        b: *mut real1_s,
+        e: *mut real1_s,
     ) -> f64;
 }
 extern "C" {
-    pub fn FactorizedVarianceFp(sid: uintq, n: uintq, q: *mut uintq, c: *mut f32) -> f64;
+    pub fn FactorizedVarianceFp(sid: uintq, n: uintq, q: *mut uintq, c: *mut real1_s) -> f64;
 }
 extern "C" {
     pub fn FactorizedVarianceFpRdm(
         sid: uintq,
         n: uintq,
         q: *mut uintq,
-        c: *mut f32,
+        c: *mut real1_s,
         r: bool,
     ) -> f64;
 }
 extern "C" {
-    pub fn UnitaryVariance(sid: uintq, n: uintq, q: *mut uintq, b: *mut f32) -> f64;
+    pub fn UnitaryVariance(sid: uintq, n: uintq, q: *mut uintq, b: *mut real1_s) -> f64;
 }
 extern "C" {
-    pub fn MatrixVariance(sid: uintq, n: uintq, q: *mut uintq, b: *mut f32) -> f64;
+    pub fn MatrixVariance(sid: uintq, n: uintq, q: *mut uintq, b: *mut real1_s) -> f64;
 }
 extern "C" {
     pub fn UnitaryVarianceEigenVal(
         sid: uintq,
         n: uintq,
         q: *mut uintq,
-        b: *mut f32,
-        e: *mut f32,
+        b: *mut real1_s,
+        e: *mut real1_s,
     ) -> f64;
 }
 extern "C" {
@@ -259,8 +260,8 @@ extern "C" {
         sid: uintq,
         n: uintq,
         q: *mut uintq,
-        b: *mut f32,
-        e: *mut f32,
+        b: *mut real1_s,
+        e: *mut real1_s,
     ) -> f64;
 }
 extern "C" {
@@ -276,16 +277,16 @@ extern "C" {
     pub fn Dump(sid: uintq, callback: ProbAmpCallback);
 }
 extern "C" {
-    pub fn InKet(sid: uintq, ket: *mut f32);
+    pub fn InKet(sid: uintq, ket: *mut real1_s);
 }
 extern "C" {
-    pub fn OutKet(sid: uintq, ket: *mut f32);
+    pub fn OutKet(sid: uintq, ket: *mut real1_s);
 }
 extern "C" {
-    pub fn OutProbs(sid: uintq, ket: *mut f32);
+    pub fn OutProbs(sid: uintq, ket: *mut real1_s);
 }
 extern "C" {
-    pub fn OutReducedDensityMatrix(sid: uintq, n: uintq, q: *mut uintq, rdm: *mut f32);
+    pub fn OutReducedDensityMatrix(sid: uintq, n: uintq, q: *mut uintq, rdm: *mut real1_s);
 }
 extern "C" {
     pub fn random_choice(sid: uintq, n: usize, p: *mut f64) -> usize;
@@ -773,28 +774,51 @@ extern "C" {
     pub fn destroy_qneuron(nid: uintq);
 }
 extern "C" {
-    pub fn set_qneuron_angles(nid: uintq, angles: *mut f32);
+    pub fn set_qneuron_angles(nid: uintq, angles: *mut real1_s);
 }
 extern "C" {
-    pub fn get_qneuron_angles(nid: uintq, angles: *mut f32);
+    pub fn get_qneuron_angles(nid: uintq, angles: *mut real1_s);
 }
 extern "C" {
     pub fn set_qneuron_sim(nid: uintq, sid: uintq, n: uintq, c: *mut uintq, q: uintq);
 }
 extern "C" {
-    pub fn qneuron_predict(nid: uintq, e: bool, r: bool, f: uintq, a: f64) -> f64;
+    pub fn qneuron_predict(
+        nid: uintq,
+        angles: *mut real1_s,
+        e: bool,
+        r: bool,
+        f: uintq,
+        a: f64,
+    ) -> f64;
 }
 extern "C" {
-    pub fn qneuron_unpredict(nid: uintq, e: bool, f: uintq, a: f64) -> f64;
+    pub fn qneuron_unpredict(nid: uintq, angles: *mut real1_s, e: bool, f: uintq, a: f64) -> f64;
 }
 extern "C" {
-    pub fn qneuron_learn_cycle(nid: uintq, e: bool, f: uintq, a: f64) -> f64;
+    pub fn qneuron_learn_cycle(nid: uintq, angles: *mut real1_s, e: bool, f: uintq, a: f64) -> f64;
 }
 extern "C" {
-    pub fn qneuron_learn(nid: uintq, eta: f64, e: bool, r: bool, f: uintq, a: f64);
+    pub fn qneuron_learn(
+        nid: uintq,
+        angles: *mut real1_s,
+        eta: f64,
+        e: bool,
+        r: bool,
+        f: uintq,
+        a: f64,
+    );
 }
 extern "C" {
-    pub fn qneuron_learn_permutation(nid: uintq, eta: f64, e: bool, r: bool, f: uintq, a: f64);
+    pub fn qneuron_learn_permutation(
+        nid: uintq,
+        angles: *mut real1_s,
+        eta: f64,
+        e: bool,
+        r: bool,
+        f: uintq,
+        a: f64,
+    );
 }
 extern "C" {
     pub fn init_qcircuit(collapse: bool, clifford: bool) -> uintq;
