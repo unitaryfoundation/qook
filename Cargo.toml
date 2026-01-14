@@ -1,6 +1,6 @@
 [package]
 name = "qook"
-version = "0.15.2"
+version = "0.15.3"
 license = "MIT"
 description = "qook - Pure Rust unitaryfund/qrack Wrapper"
 documentation = "https://pyqrack.readthedocs.io/en/latest/"

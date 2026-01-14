@@ -111,7 +111,7 @@ impl QrackNeuron<'_> {
             }
         }
         let amp_cnt = 1 << (ctrls.len() + 1);
-        let angles: Vec<Float> = vec![0 as Float; amp_cnt as usize];
+        let angles: Vec<Float> = vec![0 as Float; (1 << ctrls.len()) as usize];
         Ok(QrackNeuron{
             nid,
             simulator: sim,
