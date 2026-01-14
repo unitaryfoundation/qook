@@ -3,6 +3,8 @@
 pub const ENABLE_ALU: u32 = 1;
 pub const ENABLE_DEVRAND: u32 = 1;
 pub const ENABLE_ENV_VARS: u32 = 1;
+pub const ENABLE_FMA: u32 = 1;
+pub const ENABLE_INTRINSICS: u32 = 1;
 pub const ENABLE_OCL_MEM_GUARDS: u32 = 1;
 pub const ENABLE_OPENCL: u32 = 1;
 pub const ENABLE_OOO_OCL: u32 = 1;
@@ -762,15 +764,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn init_qneuron(
-        sid: uintq,
-        n: uintq,
-        c: *mut uintq,
-        q: uintq,
-        f: uintq,
-        a: f64,
-        tol: f64,
-    ) -> uintq;
+    pub fn init_qneuron(sid: uintq, n: uintq, c: *mut uintq, q: uintq) -> uintq;
 }
 extern "C" {
     pub fn clone_qneuron(nid: uintq) -> uintq;
@@ -785,31 +779,22 @@ extern "C" {
     pub fn get_qneuron_angles(nid: uintq, angles: *mut f32);
 }
 extern "C" {
-    pub fn set_qneuron_alpha(nid: uintq, alpha: f64);
+    pub fn set_qneuron_sim(nid: uintq, sid: uintq, n: uintq, c: *mut uintq, q: uintq);
 }
 extern "C" {
-    pub fn get_qneuron_alpha(nid: uintq) -> f64;
+    pub fn qneuron_predict(nid: uintq, e: bool, r: bool, f: uintq, a: f64) -> f64;
 }
 extern "C" {
-    pub fn set_qneuron_activation_fn(nid: uintq, f: uintq);
+    pub fn qneuron_unpredict(nid: uintq, e: bool, f: uintq, a: f64) -> f64;
 }
 extern "C" {
-    pub fn get_qneuron_activation_fn(nid: uintq) -> uintq;
+    pub fn qneuron_learn_cycle(nid: uintq, e: bool, f: uintq, a: f64) -> f64;
 }
 extern "C" {
-    pub fn qneuron_predict(nid: uintq, e: bool, r: bool) -> f64;
+    pub fn qneuron_learn(nid: uintq, eta: f64, e: bool, r: bool, f: uintq, a: f64);
 }
 extern "C" {
-    pub fn qneuron_unpredict(nid: uintq, e: bool) -> f64;
-}
-extern "C" {
-    pub fn qneuron_learn_cycle(nid: uintq, e: bool) -> f64;
-}
-extern "C" {
-    pub fn qneuron_learn(nid: uintq, eta: f64, e: bool, r: bool);
-}
-extern "C" {
-    pub fn qneuron_learn_permutation(nid: uintq, eta: f64, e: bool, r: bool);
+    pub fn qneuron_learn_permutation(nid: uintq, eta: f64, e: bool, r: bool, f: uintq, a: f64);
 }
 extern "C" {
     pub fn init_qcircuit(collapse: bool, clifford: bool) -> uintq;

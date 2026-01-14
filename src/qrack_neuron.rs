@@ -37,7 +37,6 @@ pub struct QrackNeuron<'a> {
     //     target(u64): Neuron output qubit
     //     activation_fn(NeuronActivationFn): Neuron activation function
     //     alpha(f64): Activation function parameter (if used)
-    //     tolerance(f64): Rounding tolerance
     //     amp_count(u64): Count of amplitudes in training space
     nid: u64,
     simulator: &'a QrackSimulator,
@@ -45,7 +44,6 @@ pub struct QrackNeuron<'a> {
     target: u64,
     activation_fn: NeuronActivationFn,
     alpha: f64,
-    tolerance: f64,
     amp_count: u64
 }
 
@@ -62,7 +60,6 @@ impl Clone for QrackNeuron<'_> {
             target: self.target,
             activation_fn: self.activation_fn.clone(),
             alpha: self.alpha,
-            tolerance: self.tolerance,
             amp_count: self.amp_count
         }
     }
@@ -97,7 +94,6 @@ impl QrackNeuron<'_> {
         trgt: u64,
         act_fn: NeuronActivationFn,
         a: f64,
-        t: f64
    ) -> Result<QrackNeuron<'b>, QrackError> {
         let nid;
         let mut _controls = ctrls.to_vec();
@@ -106,10 +102,7 @@ impl QrackNeuron<'_> {
                 sim.get_sid(),
                 _controls.len() as u64,
                 _controls.as_mut_ptr() as *mut u64,
-                trgt,
-                act_fn.clone() as u64,
-                a,
-                t
+                trgt
             );
             if qrack_system::get_error(nid) != 0 {
                 return Err(QrackError{});
@@ -123,7 +116,6 @@ impl QrackNeuron<'_> {
             target: trgt,
             activation_fn: act_fn,
             alpha: a,
-            tolerance: t,
             amp_count: amp_cnt
         })
     }
@@ -182,10 +174,7 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         self.alpha = a;
-        unsafe {
-            qrack_system::set_qneuron_alpha(self.nid, a);
-        }
-        self.check_error()
+        Ok(())
     }
 
     pub fn set_activation_fn(mut self, f: NeuronActivationFn) -> Result<(), QrackError> {
@@ -199,10 +188,7 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         self.activation_fn = f.clone();
-        unsafe {
-            qrack_system::set_qneuron_activation_fn(self.nid, f as u64);
-        }
-        self.check_error()
+        Ok(())
     }
 
     pub fn predict(&self, e: bool, r: bool) -> Result<f64, QrackError> {
@@ -224,7 +210,7 @@ impl QrackNeuron<'_> {
 
         let result:f64;
         unsafe {
-            result = qrack_system::qneuron_predict(self.nid, e, r);
+            result = qrack_system::qneuron_predict(self.nid, e, r, self.activation_fn.clone() as u64, self.alpha);
         }
         if self.get_error() != 0 {
             return Err(QrackError{});
@@ -246,7 +232,7 @@ impl QrackNeuron<'_> {
 
         let result:f64;
         unsafe {
-            result = qrack_system::qneuron_unpredict(self.nid, e);
+            result = qrack_system::qneuron_unpredict(self.nid, e, self.activation_fn.clone() as u64, self.alpha);
         }
         if self.get_error() != 0 {
             return Err(QrackError{});
@@ -267,7 +253,7 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         unsafe {
-            qrack_system::qneuron_learn_cycle(self.nid, e);
+            qrack_system::qneuron_learn_cycle(self.nid, e, self.activation_fn.clone() as u64, self.alpha);
         }
         self.check_error()
     }
@@ -289,7 +275,7 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         unsafe {
-            qrack_system::qneuron_learn(self.nid, eta, e, r);
+            qrack_system::qneuron_learn(self.nid, eta, e, r, self.activation_fn.clone() as u64, self.alpha);
         }
         self.check_error()
     }
@@ -311,7 +297,7 @@ impl QrackNeuron<'_> {
         //     RuntimeError: QrackNeuron C++ library raised an exception.
 
         unsafe {
-            qrack_system::qneuron_learn_permutation(self.nid, eta, e, r);
+            qrack_system::qneuron_learn_permutation(self.nid, eta, e, r, self.activation_fn.clone() as u64, self.alpha);
         }
         self.check_error()
     }
