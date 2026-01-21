@@ -743,6 +743,9 @@ extern "C" {
     pub fn SetTInjection(sid: uintq, iti: bool);
 }
 extern "C" {
+    pub fn SetUseExactNearClifford(sid: uintq, enc: bool);
+}
+extern "C" {
     pub fn SetNoiseParameter(sid: uintq, np: f64);
 }
 extern "C" {

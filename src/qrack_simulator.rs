@@ -3301,6 +3301,24 @@ impl QrackSimulator {
         self.check_error()
     }
 
+    pub fn set_use_exact_near_clifford(self, enc: bool) -> Result<(), QrackError> {
+        // Set option to use exact near-Clifford simulation
+        //
+        // If t-injection is available, this method turns exact near-Clifford
+        // simulation off/on. (Default is on.) Approximate methods are faster.
+        //
+        // Args:
+        //     enc(bool): "on/off" for exact near-Clifford simulation
+        //
+        // Raises:
+        //     RuntimeError: QrackSimulator raised an exception.
+
+        unsafe {
+            qrack_system::SetUseExactNearClifford(self.sid, enc);
+        }
+        self.check_error()
+    }
+
     pub fn set_noise_parameter(self, np: f64) -> Result<(), QrackError> {
         // Set noise parameter option
         //
